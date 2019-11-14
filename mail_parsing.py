@@ -9,9 +9,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.chrome.options import Options
+
+# chrome_options = Options()
+# chrome_options.add_argument('start-maximized')
+# chrome_options.add_argument('--headless')
 
 
-
+# driver = webdriver.Chrome(options=chrome_options)
 driver = webdriver.Chrome()
 driver.get('https://mail.ru/')
 assert 'Mail.ru: почта, поиск в интернете, новости, игры' in driver.title
@@ -40,14 +45,15 @@ for url in letters_url:
 # request to the extracted address
     lettr = requests.get(letter,
                           headers={'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-                                                 " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"}).text
-# forming html-page
-    letter_page = html.fromstring(lettr)
+                                                 " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"})
+# forming html-page (1)
+    letter_page = html.fromstring(lettr.text)
+    assert 'Входящие - Почта Mail.ru' in letter_page.xpath('//title/text')
 #parsing the page with xpath
-    topic = letter_page.xpath('//h2[@class="thread__subject"]/text').extract()
-    sender_address = letter_page.xpath('//span[@class="letter__contact-item"]/@title').extract()
-    sender_name = letter_page.xpath('//span[@class="letter__contact-item"]/text').extract()
-    letter_date = letter_page.xpath('//div[@class="letter__date"]/text').extract()
+    topic = letter_page.xpath('//h2[@class="thread__subject"]/text')
+    sender_address = letter_page.xpath('//span[@class="letter__contact-item"]/@title')
+    sender_name = letter_page.xpath('//span[@class="letter__contact-item"]/text')
+    letter_date = letter_page.xpath('//div[@class="letter__date"]/text')
     print(topic)
     print(sender_address)
     print(sender_name)
